@@ -1,14 +1,11 @@
 #include <stdio.h>
 
 #define N 600
-#define tb 1	// tamaño bloque
 
 __global__ void VecAdd(int* DA, int* DB, int* DC)
 {
-	int ii = blockIdx.x * blockDim.x + threadIdx.x;
-	int stride = blockDim.x * gridDim.x;
-	for (int i=ii; i<N; i+=stride)
-	    DC[i] = DA[i] + DB[i];
+  int i = threadIdx.x;
+  DC[i] = DA[i] + DB[i];
 }
 
 
@@ -56,9 +53,10 @@ int main()
 	  exit(0);
   }      
       
-  dg = (N+tb-1)/tb; if (dg>65535) dg=65535;
+  dg = (N+1-1)/tb; if (dg>65535) dg=65535;
   // llamamos al kernel
-  VecAdd <<<dg, tb>>>(DA, DB, DC);	// N o más hilos ejecutan el kernel en paralelo
+  VecAdd <<dg, 1>>>(DA, DB, DC);	// N o más hilos ejecutan el kernel en paralelo
+
   testerr = cudaGetLastError();
   if (testerr!= cudaSuccess) {
     printf("Error al ejecutar el kernel: %s\n", cudaGetErrorString(testerr));
@@ -71,7 +69,6 @@ int main()
 	  printf("Error en cudaMemcpy del device al host: %s\n", cudaGetErrorString(testerr));		
 	  exit(0);  
   }
-
    
   // liberamos la memoria reservada en el device
   cudaFree(DA); cudaFree(DB); cudaFree(DC);  
@@ -84,4 +81,4 @@ int main()
   }
   
   return 0;
-}
+} 
