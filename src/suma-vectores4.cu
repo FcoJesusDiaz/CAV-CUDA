@@ -1,85 +1,57 @@
 #include <stdio.h>
 
-#define N 600
+#define N 100000
 #define tb 500
 
 __global__ void VecAdd(int* DA, int* DB, int* DC)
 {
-  int i = threadIdx.x + blockIdx.x*blockDim.x;
-  DC[i] = DA[i] + DB[i];
+	int i = threadIdx.x + blockIdx.x*blockDim.x;
+    DC[i] = DA[i] + DB[i];
 }
 
-
 int main()
-{ 
-  cudaFree(0);
-  int HA[N], HB[N], HC[N];
+{ int HA[N], HB[N], HC[N];
   int *DA, *DB, *DC;
-  int i, dg; int size = N*sizeof(int);
-
+  int i; int size = N*sizeof(int);
+  cudaError_t error;
+  
   // reservamos espacio en la memoria global del device
-  cudaError_t testerr;
-  testerr = cudaMalloc((void**)&DA, size);
-  if (testerr!= cudaSuccess) {
-	  printf("Error en cudaMalloc DA: %s\n", cudaGetErrorString(testerr));
-	  exit(0);
-  }	
- 
-  testerr = cudaMalloc((void**)&DB, size);
-  if (testerr!= cudaSuccess) {
-	  printf("Error en cudaMalloc DB: %s\n", cudaGetErrorString(testerr));
-	  exit(0);
-  }		
- 
-  testerr = cudaMalloc((void**)&DC, size);
-  if (testerr!= cudaSuccess) {
-	  printf("Error en cudaMalloc DC: %s\n", cudaGetErrorString(testerr));		
-	  exit(0);
-  }
-    
+  error = cudaMalloc((void**)&DA, size);
+  if (error != cudaSuccess) printf("%s\n", cudaGetErrorString(error));
+  error = cudaMalloc((void**)&DB, size);
+  if (error != cudaSuccess) printf("%s\n", cudaGetErrorString(error));
+  error = cudaMalloc((void**)&DC, size);
+  if (error != cudaSuccess) printf("%s\n", cudaGetErrorString(error));
+  
   // inicializamos HA y HB
   for (i=0; i<N; i++) {HA[i]=-i; HB[i] = 3*i;}
- 
   
   // copiamos HA y HB del host a DA y DB en el device, respectivamente
-  testerr = cudaMemcpy(DA, HA, size, cudaMemcpyHostToDevice);
-  if (testerr != cudaSuccess) {
-	  printf("Error en cudaMemcpy del host al device: %s\n", cudaGetErrorString(testerr));		
-	  exit(0);
-  }
- 
-  testerr = cudaMemcpy(DB, HB, size, cudaMemcpyHostToDevice);
-  if (testerr != cudaSuccess) {
-	  printf("Error en cudaMemcpy del host al device: %s\n", cudaGetErrorString(testerr));		
-	  exit(0);
-  }      
-      
-  dg = (N+tb-1)/tb; if (dg>65535) dg=65535;
-  // llamamos al kernel
-  VecAdd <<dg, tb>>>(DA, DB, DC);	// N o más hilos ejecutan el kernel en paralelo
+  error = cudaMemcpy(DA, HA, size, cudaMemcpyHostToDevice);
+  if (error != cudaSuccess) printf("%s\n", cudaGetErrorString(error));
+  error = cudaMemcpy(DB, HB, size, cudaMemcpyHostToDevice);
+  if (error != cudaSuccess) printf("%s\n", cudaGetErrorString(error));
+  
+  int blocks = (N+tb-1)/tb;
 
-  testerr = cudaGetLastError();
-  if (testerr!= cudaSuccess) {
-    printf("Error al ejecutar el kernel: %s\n", cudaGetErrorString(testerr));
-	  exit(0);
-  }    
+  VecAdd <<<blocks, tb>>>(DA, DB, DC);	
+  cudaError_t error_synchro = cudaGetLastError();
+  cudaError_t error_asynchro = cudaDeviceSynchronize();
+  if (error_synchro != cudaSuccess) printf("Sync kernel error: %s\n", cudaGetErrorString(error_synchro));
+  if (error_asynchro != cudaSuccess) printf("Async kernel error: %s\n", cudaGetErrorString(error_asynchro));
   
   // copiamos el resultado, que está en la memoria global del device, (DC) al host (a HC)
-  testerr = cudaMemcpy(HC, DC, size, cudaMemcpyDeviceToHost);
-  if (testerr != cudaSuccess) {
-	  printf("Error en cudaMemcpy del device al host: %s\n", cudaGetErrorString(testerr));		
-	  exit(0);  
-  }
-   
+  error = cudaMemcpy(HC, DC, size, cudaMemcpyDeviceToHost);
+  if (error != cudaSuccess) printf("%s\n", cudaGetErrorString(error));
+  
   // liberamos la memoria reservada en el device
   cudaFree(DA); cudaFree(DB); cudaFree(DC);  
   
   // una vez que tenemos los resultados en el host, comprobamos que son correctos
-  for (i = 0; i < N; i++){
-    printf("%d + %d = %d\n",HA[i],HB[i],HC[i]);
+  // esta comprobación debe quitarse una vez que el programa es correcto (p. ej., para medir el tiempo de ejecución)
+  for (i = 0; i < N; i++) // printf("%d + %d = %d\n",HA[i],HB[i],HC[i]);
     if (HC[i]!= (HA[i]+HB[i])) 
 		{printf("error en componente %d\n", i); break;}
-  }
-  
+    
   return 0;
 } 
