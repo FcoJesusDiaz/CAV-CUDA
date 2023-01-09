@@ -14,9 +14,9 @@ compile:
 	$(CC) $(DIRSRC)suma-vectores2.cu -o $(DIREXE)suma-vectores2
 	$(CC) $(DIRSRC)suma-vectores3.cu -o $(DIREXE)suma-vectores3
 	$(CC) $(DIRSRC)suma-vectores4.cu -o $(DIREXE)suma-vectores4
-	$(CC) $(DIRSRC)trapuesta1.cu -o $(DIREXE)trapuesta1
-	$(CC) $(DIRSRC)trapuesta2.cu -o $(DIREXE)trapuesta2
-	$(CC) $(DIRSRC)trapuesta3.cu -o $(DIREXE)trapuesta3
+	$(CC) $(DIRSRC)traspuesta1.cu -o $(DIREXE)trapuesta1
+	$(CC) $(DIRSRC)traspuesta2.cu -o $(DIREXE)trapuesta2
+	$(CC) $(DIRSRC)traspuesta3.cu -o $(DIREXE)trapuesta3
 
 clean : 
 	rm -rf *~ core $(DIREXE) $(DIRSRC)*~ 
