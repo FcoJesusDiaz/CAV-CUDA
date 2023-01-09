@@ -9,7 +9,7 @@ Se ha proporcionado un Makefile para la compilación de todos los ejercicios. Pa
 
 - make all
 
-Esta regla engloba 'make dirs' que crea el directorio 'exec' y 'compile' que compila todos los ejercicios y mete los ejecutables en dicha carpeta.
+Esta regla engloba 'make dirs' que crea el directorio 'exec' y 'make compile' que compila todos los ejercicios y mete los ejecutables en dicha carpeta.
 
 Para borrar el directorio 'exec' y todos los ejecutables:
 
