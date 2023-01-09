@@ -48,7 +48,6 @@ int main()
   // una vez que tenemos los resultados en el host, comprobamos que son correctos
   // esta comprobación debe quitarse una vez que el programa es correcto (p. ej., para medir el tiempo de ejecución)
   for (i = 0; i < N; i++) {
-    printf("%d + %d = %d\n",HA[i],HB[i],HC[i]);
     if (HC[i]!= (HA[i]+HB[i])) 
 		{printf("error en componente %d\n", i); break;}
    } 

@@ -33,7 +33,7 @@ int main()
   
   // llamamos al kernel (1 bloque de N hilos)
   VecAdd <<<N, 1>>>(DA, DB, DC);	// N hilos ejecutan el kernel en paralelo
-  
+
   cudaError_t error_synchro = cudaGetLastError();
   cudaError_t error_asynchro = cudaDeviceSynchronize();
   if (error_synchro != cudaSuccess) printf("Sync kernel error: %s\n", cudaGetErrorString(error_synchro));
@@ -49,11 +49,8 @@ int main()
   // una vez que tenemos los resultados en el host, comprobamos que son correctos
   // esta comprobación debe quitarse una vez que el programa es correcto (p. ej., para medir el tiempo de ejecución)
   for (i = 0; i < N; i++){
-    //printf("%d + %d = %d\n",HA[i],HB[i],HC[i]);
     if (HC[i]!= (HA[i]+HB[i])) 
-		{
-        printf("error en componente %d\n", i);
-        break;}
+		{printf("error en componente %d\n", i); break;}
   }
     
   return 0;
