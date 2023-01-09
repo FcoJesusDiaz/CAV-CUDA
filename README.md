@@ -1,4 +1,8 @@
 # CAV-CUDA
+## Autor
+- Francisco Jesús Díaz Pellejero
+
+## Compilación y limpiado de archivos
 Ejercicios de Cuda: Matriz tranpuesta y suma de vectores
 
 Se ha proporcionado un Makefile para la compilación de todos los ejercicios. Para crear el directorio 'exec' donde estarán todos los ejecutables y compilar todo:
